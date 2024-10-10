@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-container {
+            position: relative;
+            width: 1000px;
+            height: 100%;
+            border: 2px solid #2a5298;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none; /* Initially hidden */
+        }
+        .leaderboard {
+            margin-top: 20px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .controls {
+            margin-top: 10px;
+            color: white;
+            font-size: 18px;
+        }
+        .controls span {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+    <script>
+        function loadGame() {
+            const iframe = document.getElementById('gameFrame');
+            const overlay = document.querySelector('.play-overlay');
+            overlay.style.display = 'none'; 
+            iframe.style.display = 'block'; 
+            iframe.src = "/game_frame/survivor.html";  
+        }
+    </script>
+    
+</head>
+<body>
+    <h2 >Welcome to the Game!</h2>
+    <div class="game-container">
+        <div class="play-overlay" onclick="loadGame()">
+            ▶ Play Game
+        </div>
+        <iframe id="gameFrame"></iframe>
+    </div>
+    <div class="leaderboard">
+        <h3>Leaderboard</h3>
+        <ul id="scoreList">
+            <!-- Scores will be populated here -->
+        </ul>
+    </div>
+    
+    <script>
+        async function fetchScores() {
+            try {
+                const response = await fetch('/get_scores');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const scores = await response.json();
+    
+                const scoreList = document.getElementById('scoreList');
+                scoreList.innerHTML = ''; // Clear any existing scores
+    
+                scores.forEach((score) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${score.username}: ${score.score}`;
+                    scoreList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching scores:', error);
+            }
+        }
+    
+   
+        document.addEventListener('DOMContentLoaded', fetchScores);
+    </script>
+    
+    <div class="controls">
+        <h3>Controls</h3>
+        <span>🖱️ Left Click: Move</span>
+        <span>🖱️ Right Click: Attack</span>
+    </div>
+</body>
+</html>
